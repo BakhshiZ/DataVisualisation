@@ -1,9 +1,17 @@
 WIN_WIDTH, WIN_HEIGHT = 1280, 720
+PLAYABLE_ROWS, PLAYABLE_COLUMNS = 116, 72
+TEXT_BUTTON_HEIGHT = 12
+BUTTON_WIDTH = (WIN_WIDTH - 160) // 4
 
 COLOURS = {
     "GRIDLINES" : (0, 0, 0),
     "TEXT" : (255, 255, 255),
     "BGCOLOUR" : (33, 53, 85),
     "BUTTON_LIGHT" : (216, 196, 182),
-    "BUTTON_NORMAL" : (62, 88, 121)
+    "BUTTON_NORMAL" : (62, 88, 121),
+    "NEUTRAL": (211, 211, 211),
+    "VISITED": (255, 0, 0),
+    "TO_BE_VISITED": (0, 255, 0)
 }
+
+STATES = {v:k for k, v in COLOURS.items()}
