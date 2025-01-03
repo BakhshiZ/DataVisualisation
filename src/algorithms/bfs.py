@@ -1,23 +1,24 @@
-"""
-visited, queue = empty
-queue = start
-visited = start
+from ..utils.grid import *
+from ..utils.constants import COLOURS
 
-pop start
-queue the neigbours
-
-visit neighbour one, add to visited and pop it from queue
-queue its neighbours
-
-visit neighbour two, add to visited and pop it from queue
-queue its neighbours
-
-visit neighbour one first neighbour, add to visited amd pop it from queue
-queue its neighbours
-
-repeat until no more nodes or at end
-"""
-
-def bfs(grid):
+def bfs(grid, start_x, start_y):
     visited = []
-    queue = []
+    queue = [grid[start_x][start_y]]
+
+    while len(queue) != 0:
+        if grid[queue[0]].colour == COLOURS["END"]:
+            path = []
+            current_node = queue[0]
+            while current_node.get_parent() is not None:
+                path.append(current_node)
+                current_node = current_node.get_parent()
+            path.append(current_node)
+            path = path.reverse()
+            return path
+
+        visited.append(queue[0])
+        for neighbour in queue[0].get_neighbours():
+            queue.append(neighbour)
+        queue.pop(0)
+
+    return None

@@ -11,7 +11,9 @@ COLOURS = {
     "BUTTON_NORMAL" : (62, 88, 121),
     "NEUTRAL": (211, 211, 211),
     "VISITED": (255, 0, 0),
-    "TO_BE_VISITED": (0, 255, 0)
+    "TO_BE_VISITED": (0, 255, 0),
+    "START" : (255, 165, 0),
+    "END" : (0, 0, 255)
 }
 
 STATES = {v:k for k, v in COLOURS.items()}
