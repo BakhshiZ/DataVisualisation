@@ -1,0 +1,9 @@
+WIN_WIDTH, WIN_HEIGHT = 1280, 720
+
+COLOURS = {
+    "GRIDLINES" : (0, 0, 0),
+    "TEXT" : (255, 255, 255),
+    "BGCOLOUR" : (33, 53, 85),
+    "BUTTON_LIGHT" : (216, 196, 182),
+    "BUTTON_NORMAL" : (62, 88, 121)
+}
