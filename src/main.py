@@ -10,11 +10,15 @@ from utils.constants import *
 from utils.grid import *
 
 pygame.init()
-grid = create_grid()
+game_grid = create_grid()
 
-screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+button_surface = pygame.Surface((BUTTON_WIN_WIDTH, BUTTON_WIN_HEIGHT))
+game_surface = pygame.Surface((GAME_WIN_WIDTH, GAME_WIN_HEIGHT))
+master_screen = pygame.display.set_mode((GAME_WIN_WIDTH, GAME_WIN_HEIGHT + BUTTON_WIN_HEIGHT))
+
 pygame.display.set_caption("Searching algorithms by BakhshiZ")
-screen.fill(COLOURS['BGCOLOUR'])
+
+
 buttonFont = pygame.font.SysFont('Arial', 20)
 
 running = True
@@ -24,55 +28,51 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    # Drawing gridlines
-    for i in range(PLAYABLE_ROWS):
-        pygame.draw.line(screen, COLOURS["GRIDLINES"], (70 + i * 10, 60), (70 + i * 10, WIN_HEIGHT - 10))
-    for j in range(PLAYABLE_COLUMNS):
-        pygame.draw.line(screen, COLOURS["GRIDLINES"], (70, 60 + j * 10), (WIN_WIDTH - 60, 60 + j * 10))
+    button_surface.fill(COLOURS["BGCOLOUR"])
+
+    # Define button positions and properties
+    button_spacing = 10
+    button_width = BUTTON_WIDTH
+    button_height = 40
+    button_y = 5
 
     mouse_pos = pygame.mouse.get_pos()
 
-    # Drawing and colouring all 4 buttons
-    pygame.draw.rect(screen, COLOURS["BUTTON_NORMAL"], ((70, 5), ((WIN_WIDTH - 160) // 4, 40)), border_radius=10)
-    pygame.draw.rect(screen, COLOURS["BUTTON_NORMAL"], ((80 + (WIN_WIDTH - 160) // 4, 5), ((WIN_WIDTH - 160) // 4, 40)),
-                     border_radius=10)
-    pygame.draw.rect(screen, COLOURS["BUTTON_NORMAL"], ((90 + 2 * (WIN_WIDTH - 160) // 4, 5), ((WIN_WIDTH - 160) // 4, 40)),
-                     border_radius=10)
-    pygame.draw.rect(screen, COLOURS["BUTTON_NORMAL"], ((100 + 3 * (WIN_WIDTH - 160) // 4, 5), ((WIN_WIDTH - 160) // 4, 40)),
-                     border_radius=10)
+    for i in range(4):
+        button_x = 70 + i * (button_spacing + button_width)
+        rect = pygame.Rect(button_x, button_y, button_width, button_height)
 
-    if (70 <= mouse_pos[0] <= (70 + BUTTON_WIDTH)) and (5 <= mouse_pos[1] <= 40):
-        pygame.draw.rect(screen, COLOURS["BUTTON_LIGHT"], ((70, 5), (BUTTON_WIDTH, 40)), border_radius=10)
+        # Check if mouse is hovering over the button
+        if rect.collidepoint(mouse_pos):
+            color = COLOURS["BUTTON_LIGHT"]
+        else:
+            color = COLOURS["BUTTON_NORMAL"]
 
-    elif ((80 + BUTTON_WIDTH) <= mouse_pos[0] <= (80 + 2 * BUTTON_WIDTH)) and (5 <= mouse_pos[1] <= 40):
-        pygame.draw.rect(screen, COLOURS["BUTTON_LIGHT"], ((80 + BUTTON_WIDTH, 5), (BUTTON_WIDTH, 40)),
-                         border_radius=10)
+        pygame.draw.rect(button_surface, color, rect, border_radius=10)
 
-    elif ((90 + 2 * BUTTON_WIDTH) <= mouse_pos[0] <= (90 + 3 * BUTTON_WIDTH)) and (5 <= mouse_pos[1] <= 40):
-        pygame.draw.rect(screen, COLOURS["BUTTON_LIGHT"], ((90 + 2 * BUTTON_WIDTH, 5), (BUTTON_WIDTH, 40)),
-                         border_radius=10)
+        match i:
+            case 0:
+                a_star_text = buttonFont.render('A*', True, COLOURS["TEXT"])
+                a_star_text_rect = a_star_text.get_rect(center=rect.center)
+                button_surface.blit(a_star_text, a_star_text_rect)
 
-    elif ((100 + 3 * BUTTON_WIDTH) <= mouse_pos[0] <= (100 + 4 * BUTTON_WIDTH)) and (5 <= mouse_pos[1] <= 40):
-        pygame.draw.rect(screen, COLOURS["BUTTON_LIGHT"], ((100 + 3 * BUTTON_WIDTH, 5), (BUTTON_WIDTH, 40)),
-                         border_radius=10)
+            case 1:
+                bfs_text = buttonFont.render('BFS', True, COLOURS["TEXT"])
+                bfs_text_rect = bfs_text.get_rect(center=rect.center)
+                button_surface.blit(bfs_text, bfs_text_rect)
 
-    # Adding labels to buttons
-    a_star_text = buttonFont.render('A*', True, COLOURS["TEXT"])
-    a_star_width = (140 + BUTTON_WIDTH) // 2
+            case 2:
+                dfs_text = buttonFont.render('DFS', True, COLOURS["TEXT"])
+                dfs_text_rect = dfs_text.get_rect(center=rect.center)
+                button_surface.blit(dfs_text, dfs_text_rect)
 
-    bfs_text = buttonFont.render('BFS', True, COLOURS["TEXT"])
-    bfs_width = (160 + 2.8 * BUTTON_WIDTH) // 2
+            case 3:
+                dijkstra_text = buttonFont.render('Dijkstra', True, COLOURS["TEXT"])
+                dijkstra_text_rect = dijkstra_text.get_rect(center=rect.center)
+                button_surface.blit(dijkstra_text, dijkstra_text_rect)
 
-    dfs_text = buttonFont.render('DFS', True, COLOURS["TEXT"])
-    dfs_width = (180 + 4.8 * BUTTON_WIDTH) // 2
-
-    dijkstra_text = buttonFont.render('Dijkstra', True, COLOURS["TEXT"])
-    dijkstra_width = (200 + 6.6 * BUTTON_WIDTH) // 2
-
-    screen.blit(a_star_text, (a_star_width, TEXT_BUTTON_HEIGHT))
-    screen.blit(bfs_text, (bfs_width, TEXT_BUTTON_HEIGHT))
-    screen.blit(dfs_text, (dfs_width, TEXT_BUTTON_HEIGHT))
-    screen.blit(dijkstra_text, (dijkstra_width, TEXT_BUTTON_HEIGHT))
+    master_screen.blit(button_surface, (0, 0))
+    master_screen.blit(game_surface, (0, BUTTON_WIN_HEIGHT))
 
     pygame.display.update()
 

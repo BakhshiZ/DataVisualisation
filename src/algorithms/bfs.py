@@ -1,4 +1,3 @@
-from typing import List
 from ..utils.grid import *
 from ..utils.constants import COLOURS
 
