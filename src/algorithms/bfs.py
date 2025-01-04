@@ -1,12 +1,13 @@
+from typing import List
 from ..utils.grid import *
 from ..utils.constants import COLOURS
 
-def bfs(grid, start_x, start_y):
+def bfs(grid: List[List["Node"]], start_x, start_y):
     visited = []
     queue = [grid[start_x][start_y]]
 
     while len(queue) != 0:
-        if grid[queue[0]].colour == COLOURS["END"]:
+        if queue[0].colour == COLOURS["END"]:
             path = []
             current_node = queue[0]
             while current_node.get_parent() is not None:

@@ -7,8 +7,11 @@
 
 import pygame
 from utils.constants import *
+from utils.grid import *
 
 pygame.init()
+grid = create_grid()
+
 screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 pygame.display.set_caption("Searching algorithms by BakhshiZ")
 screen.fill(COLOURS['BGCOLOUR'])
@@ -21,11 +24,10 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-
     # Drawing gridlines
-    for i in range(PLAYABLE_ROWS + 1):
+    for i in range(PLAYABLE_ROWS):
         pygame.draw.line(screen, COLOURS["GRIDLINES"], (70 + i * 10, 60), (70 + i * 10, WIN_HEIGHT - 10))
-    for j in range(PLAYABLE_COLUMNS + 1):
+    for j in range(PLAYABLE_COLUMNS):
         pygame.draw.line(screen, COLOURS["GRIDLINES"], (70, 60 + j * 10), (WIN_WIDTH - 60, 60 + j * 10))
 
     mouse_pos = pygame.mouse.get_pos()

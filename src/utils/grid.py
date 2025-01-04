@@ -3,7 +3,7 @@
 *
 """
 from typing import List
-from constants import COLOURS, PLAYABLE_ROWS, PLAYABLE_COLUMNS, STATES
+from src.utils.constants import COLOURS, PLAYABLE_ROWS, PLAYABLE_COLUMNS, STATES
 
 class Node:
     def __init__(self, x: int, y: int) -> None:
@@ -47,4 +47,4 @@ def get_start(grid):
     for i in range(PLAYABLE_ROWS):
         for j in range(PLAYABLE_COLUMNS):
             if grid[i][j].colour == COLOURS["START"]:
-                return (i, j)
+                return tuple(i, j)
