@@ -19,7 +19,7 @@ COLOURS = {
     "START" : (255, 165, 0),
     "END" : (0, 206, 209),
     "BARRIER" : (0, 0, 0),
-    "PATH" : (255, 255, 255)
+    "PATH" : (255, 255, 0)
 }
 
 STATES = {v:k for k, v in COLOURS.items()}

@@ -6,10 +6,8 @@
 """
 
 import pygame
-
-from src.utils.constants import COLOURS
-from utils.constants import *
-from utils.grid import *
+from src.utils.constants import *
+from src.utils.grid import *
 from src.algorithms import *
 
 pygame.init()
@@ -30,11 +28,13 @@ running_alg = None
 current_alg = None
 
 running = True
-
+start_x = None
+start_y = None
 button_width = BUTTON_WIDTH
 button_height = 40
 button_y = 5
 button_spacing = 10
+queue = []
 path = None
 
 while running:
@@ -65,19 +65,21 @@ while running:
                     if current_button == 1:  # Left-click held
                         if curr_node.colour == COLOURS["NEUTRAL"]:
                             if not is_start:
-                                curr_node.colour = COLOURS["START"]
+                                curr_node.set_state("START")
+                                start_x = curr_node.x
+                                start_y = curr_node.y
                                 is_start = True
                             elif not is_end:
-                                curr_node.colour = COLOURS["END"]
+                                curr_node.set_state("END")
                                 is_end = True
                             else:
-                                curr_node.colour = COLOURS["BARRIER"]
+                                curr_node.set_state("BARRIER")
 
                     elif current_button == 3:  # Right-click held
                         if curr_node.colour != COLOURS["NEUTRAL"]:
-                            if curr_node.colour == COLOURS["START"]:
+                            if curr_node.get_state() == "START":
                                 is_start = False
-                            elif curr_node.colour == COLOURS["END"]:
+                            elif curr_node.get_state() == "END":
                                 is_end = False
                             curr_node.reset_node()
             else:
@@ -96,9 +98,13 @@ while running:
                     running_alg = True
 
     if running_alg:
-        start_x, start_y = get_start(game_grid)
+        for row in game_grid:
+            for cell in row:
+                cell.get_neighbours(game_grid)
+
         if current_alg == "BFS":
-            path = bfs.bfs(game_grid, start_x, start_y)
+            path = bfs.bfs(game_grid, start_x, start_y, game_surface, master_screen)
+
         # elif current_alg == "A*":
         #     path = astar(game_grid, start_x, start_y)
         # elif current_alg == "DFS":
@@ -109,11 +115,16 @@ while running:
         # Visualize the path
         if path:
             for node in path:
-                pygame.draw.rect(game_surface, COLOURS["PATH"], (node.x * NODE_SPACING, node.y * NODE_SPACING, NODE_SPACING, NODE_SPACING))
+                pygame.draw.rect(
+                    game_surface,
+                    COLOURS[node.get_state()],
+                    (node.x * NODE_SPACING, node.y * NODE_SPACING, NODE_SPACING, NODE_SPACING),
+                )
+                master_screen.blit(game_surface, (0, BUTTON_WIN_HEIGHT))
                 pygame.display.update()
                 pygame.time.delay(50)
             path = None
-
+            pygame.time.delay(5000)
         running_algorithm = False
         selected_algorithm = None
         reset_grid_paths(game_grid)
