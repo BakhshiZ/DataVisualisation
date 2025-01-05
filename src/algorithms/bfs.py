@@ -2,23 +2,28 @@ from ..utils.grid import *
 from ..utils.constants import COLOURS
 
 def bfs(grid: List[List["Node"]], start_x, start_y):
-    visited = []
-    queue = [grid[start_x][start_y]]
+    start_node = grid[start_x][start_y]
+    queue = [start_node]
+    visited = set()
 
-    while len(queue) != 0:
-        if queue[0].colour == COLOURS["END"]:
+    while queue:
+        current_node = queue.pop(0)
+        current_node.colour = COLOURS["VISITED"]
+
+        if current_node.colour == COLOURS["END"]:
             path = []
-            current_node = queue[0]
-            while current_node.get_parent() is not None:
+            while current_node:
                 path.append(current_node)
                 current_node = current_node.get_parent()
-            path.append(current_node)
-            path = path.reverse()
+            path.reverse()
             return path
 
-        visited.append(queue[0])
-        for neighbour in queue[0].get_neighbours():
-            queue.append(neighbour)
-        queue.pop(0)
+        visited.add(current_node)
+
+        for neighbour in current_node.get_neighbours(grid):
+            if neighbour not in visited:
+                neighbour.set_parent(current_node)
+                neighbour.colour = COLOURS["TO_BE_VISITED"]
+                queue.append(neighbour)
 
     return None

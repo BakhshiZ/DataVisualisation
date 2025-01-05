@@ -17,7 +17,9 @@ COLOURS = {
     "VISITED": (255, 0, 0),
     "TO_BE_VISITED": (0, 255, 0),
     "START" : (255, 165, 0),
-    "END" : (0, 0, 255)
+    "END" : (0, 206, 209),
+    "BARRIER" : (0, 0, 0),
+    "PATH" : (255, 255, 255)
 }
 
 STATES = {v:k for k, v in COLOURS.items()}
