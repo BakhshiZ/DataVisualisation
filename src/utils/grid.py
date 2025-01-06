@@ -17,12 +17,12 @@ class Node:
 
     def get_neighbours(self, grid) -> List['Node']:
         neighbors = []
+        if self.y + 1 < PLAYABLE_COLUMNS and grid[self.x][self.y + 1].get_state() != "BARRIER":
+            neighbors.append(grid[self.x][self.y + 1])
         if self.x + 1 < PLAYABLE_ROWS and grid[self.x + 1][self.y].get_state() != "BARRIER":
             neighbors.append(grid[self.x + 1][self.y])
         if self.x - 1 >= 0 and grid[self.x - 1][self.y].get_state() != "BARRIER":
             neighbors.append(grid[self.x - 1][self.y])
-        if self.y + 1 < PLAYABLE_COLUMNS and grid[self.x][self.y + 1].get_state() != "BARRIER":
-            neighbors.append(grid[self.x][self.y + 1])
         if self.y - 1 >= 0 and grid[self.x][self.y - 1].get_state() != "BARRIER":
             neighbors.append(grid[self.x][self.y - 1])
         return neighbors
@@ -35,6 +35,8 @@ class Node:
 
     def reset_node(self):
         self.colour = COLOURS["NEUTRAL"]
+        self.neighbours = []
+        self.parent = None
 
 def create_grid() -> List[List["Node"]]:
     grid: List[List["Node"]] = []
@@ -53,5 +55,5 @@ def get_start(grid: List[List["Node"]]):
 def reset_grid_paths(grid):
     for row in grid:
         for node in row:
-            if node.get_state() not in ["NEUTRAL", "BARRIER"]:
+            if node.get_state() in ["PATH", "VISITED", "TO_BE_VISITED"]:
                 node.reset_node()

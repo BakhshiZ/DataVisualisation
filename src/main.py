@@ -1,14 +1,8 @@
-"""
-* Initialize and render the GUI using Pygame.
-* Handle user input (e.g., placing start/end points, barriers).
-* Call the appropriate pathfinding algorithm (BFS, DFS, Dijkstra, A*).
-* Visualize the algorithm's progress and final path.
-"""
-
 import pygame
 from src.utils.constants import *
 from src.utils.grid import *
 from src.algorithms import *
+from tkinter import Tk, messagebox
 
 pygame.init()
 game_grid = create_grid()
@@ -24,7 +18,7 @@ pygame.display.set_caption("Searching algorithms by BakhshiZ")
 buttonFont = pygame.font.SysFont('Arial', 20)
 mouse_held = False
 current_button = None
-running_alg = None
+running_alg = False
 current_alg = None
 
 running = True
@@ -34,14 +28,57 @@ button_width = BUTTON_WIDTH
 button_height = 40
 button_y = 5
 button_spacing = 10
-queue = []
 path = None
 
 while running:
-
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                if is_start and is_end:
+                    if not current_alg:
+                        Tk().wm_withdraw()
+                        messagebox.showinfo('Error', 'Please select an algorithm to run.')
+                        continue
+
+                    # Update neighbors for all grid nodes
+                    for row in game_grid:
+                        for cell in row:
+                            cell.get_neighbours(game_grid)
+
+                    path = None
+                    running_alg = True
+                    print(f"Running {current_alg} algorithm...")
+
+                    # Call the selected algorithm
+                    if current_alg == "BFS":
+                        path = bfs.bfs(game_grid, start_x, start_y, game_surface, master_screen)
+                    # elif current_alg == "A*":
+                    #     path = astar.astar(game_grid, start_x, start_y)
+                    # elif current_alg == "DFS":
+                    #     path = dfs.dfs(game_grid, start_x, start_y)
+                    # elif current_alg == "Dijkstra":
+                    #     path = dijkstra.dijkstra(game_grid, start_x, start_y)
+
+                    running_alg = False
+
+                    # Visualize the path
+                    if path:
+                        for node in path:
+                            pygame.draw.rect(
+                                game_surface,
+                                COLOURS[node.get_state()],
+                                (node.x * NODE_SPACING, node.y * NODE_SPACING, NODE_SPACING, NODE_SPACING),
+                            )
+                            master_screen.blit(game_surface, (0, BUTTON_WIN_HEIGHT))
+                            pygame.display.update()
+                            pygame.time.delay(50)
+
+            elif event.key == pygame.K_c:
+                running_alg = False
+                reset_grid_paths(game_grid)
 
         elif event.type == pygame.MOUSEBUTTONUP:
             mouse_held = False
@@ -66,8 +103,7 @@ while running:
                         if curr_node.colour == COLOURS["NEUTRAL"]:
                             if not is_start:
                                 curr_node.set_state("START")
-                                start_x = curr_node.x
-                                start_y = curr_node.y
+                                start_x, start_y = curr_node.x, curr_node.y
                                 is_start = True
                             elif not is_end:
                                 curr_node.set_state("END")
@@ -95,93 +131,37 @@ while running:
                     elif button_num == 3:
                         current_alg = "Dijkstra"
 
-                    running_alg = True
-
-    if running_alg:
-        for row in game_grid:
-            for cell in row:
-                cell.get_neighbours(game_grid)
-
-        if current_alg == "BFS":
-            path = bfs.bfs(game_grid, start_x, start_y, game_surface, master_screen)
-
-        # elif current_alg == "A*":
-        #     path = astar(game_grid, start_x, start_y)
-        # elif current_alg == "DFS":
-        #     path = dfs(game_grid, start_x, start_y)
-        # elif current_alg == "Dijkstra":
-        #     path = dijkstra(game_grid, start_x, start_y)
-
-        # Visualize the path
-        if path:
-            for node in path:
-                pygame.draw.rect(
-                    game_surface,
-                    COLOURS[node.get_state()],
-                    (node.x * NODE_SPACING, node.y * NODE_SPACING, NODE_SPACING, NODE_SPACING),
-                )
-                master_screen.blit(game_surface, (0, BUTTON_WIN_HEIGHT))
-                pygame.display.update()
-                pygame.time.delay(50)
-            path = None
-            pygame.time.delay(5000)
-        running_algorithm = False
-        selected_algorithm = None
-        reset_grid_paths(game_grid)
-
+    # Render Buttons
     button_surface.fill(COLOURS["BGCOLOUR"])
-
     mouse_pos = pygame.mouse.get_pos()
     for i in range(4):
         button_x = 70 + i * (button_spacing + button_width)
         rect = pygame.Rect(button_x, button_y, button_width, button_height)
 
         # Check if mouse is hovering over the button
-        if rect.collidepoint(mouse_pos):
-            color = COLOURS["BUTTON_LIGHT"]
-        else:
-            color = COLOURS["BUTTON_NORMAL"]
+        color = COLOURS["BUTTON_LIGHT"] if rect.collidepoint(mouse_pos) else COLOURS["BUTTON_NORMAL"]
 
         pygame.draw.rect(button_surface, color, rect, border_radius=10)
-
-        match i:
-            case 0:
-                text = buttonFont.render('A*', True, COLOURS["TEXT"])
-            case 1:
-                text = buttonFont.render('BFS', True, COLOURS["TEXT"])
-            case 2:
-                text = buttonFont.render('DFS', True, COLOURS["TEXT"])
-            case 3:
-                text = buttonFont.render('Dijkstra', True, COLOURS["TEXT"])
-
+        text = buttonFont.render(["A*", "BFS", "DFS", "Dijkstra"][i], True, COLOURS["TEXT"])
         text_rect = text.get_rect(center=rect.center)
         button_surface.blit(text, text_rect)
 
+    # Render Grid
     for row in game_grid:
         for cell in row:
-            pygame.draw.rect(game_surface,
-                             cell.colour,
-                             rect=((cell.x * NODE_SPACING, cell.y * NODE_SPACING),
-                                   (NODE_SPACING, NODE_SPACING)))
+            pygame.draw.rect(
+                game_surface,
+                cell.colour,
+                ((cell.x * NODE_SPACING, cell.y * NODE_SPACING), (NODE_SPACING, NODE_SPACING)),
+            )
 
     for i in range(PLAYABLE_ROWS):
-        pygame.draw.line(game_surface,
-                         COLOURS["GRIDLINES"],
-                         (i * NODE_SPACING, 0),
-                         (i * NODE_SPACING, GAME_WIN_WIDTH)
-                         )
-
+        pygame.draw.line(game_surface, COLOURS["GRIDLINES"], (i * NODE_SPACING, 0), (i * NODE_SPACING, GAME_WIN_WIDTH))
     for j in range(PLAYABLE_COLUMNS):
-        pygame.draw.line(game_surface,
-                         COLOURS["GRIDLINES"],
-                         (0, j * NODE_SPACING),
-                         (GAME_WIN_WIDTH, j * NODE_SPACING)
-                         )
-
+        pygame.draw.line(game_surface, COLOURS["GRIDLINES"], (0, j * NODE_SPACING), (GAME_WIN_WIDTH, j * NODE_SPACING))
 
     master_screen.blit(button_surface, (0, 0))
     master_screen.blit(game_surface, (0, BUTTON_WIN_HEIGHT))
-
     pygame.display.update()
 
 pygame.quit()

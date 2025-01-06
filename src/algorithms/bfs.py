@@ -12,8 +12,9 @@ def bfs(grid, start_x, start_y, game_surface, master_screen):
         # If the current node is the "END" node, construct the path and exit
         if current_node.get_state() == "END":
             path = []
-            while current_node:
-                current_node.set_state("PATH")  # Set the path state for visualization
+            while current_node.get_parent() is not None:
+                if current_node.get_state() != "END":
+                    current_node.set_state("PATH")  # Set the path state for visualization
                 path.append(current_node)
                 current_node = current_node.get_parent()
             path.reverse()  # Reverse the path to get it from start to end
